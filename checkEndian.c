@@ -9,7 +9,7 @@ int main()
     };
     union chkEndian chk;
     chk.x = 1;
-    if (chk.unData[1] == 0)
+    if (chk.unData[0] != 0)
     {
         printf("Little Endian");
     }
