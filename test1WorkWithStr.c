@@ -45,3 +45,23 @@ int memStrCmp(char *s1, char *s2)
              return 0;
          }
 }
+
+void strCopy(char *s1, char *s2)
+{
+    int i = 0;
+    for (i = 0; i < strlen(s2) + 1; i++)
+        s1[i] = s2[i];
+}
+
+void concat(char *dst, char *src)
+{
+    int lnD, lnS;
+    lnD = strlen(dst);
+    lnS = strlen(src);
+    int i =0;
+    for (; i < lnS; i++)
+    {
+        dst[i + lnD] = src[i];
+    }
+    dst[lnD + lnS] = 0;
+}
