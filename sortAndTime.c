@@ -5,8 +5,10 @@
 const maxVal = 100;
 int n;
 int *pData = NULL;
+clock_t start = 0, fin = 0;
+int dontWaitMore;
 
-void screwUpData(int *pData)
+void screwUpData()
 {
    int i;
    for (i = 0; i < n; i++)
@@ -15,7 +17,7 @@ void screwUpData(int *pData)
     }
 }
 
-void print(int *pData)
+void print()
 {
     int i = 0;
     for (; i < n; i++)
@@ -25,12 +27,20 @@ void print(int *pData)
     printf("\n");
 }
 
-void bubbleSort(int *pData)
+void bubbleSort()
 {
+    dontWaitMore = 0;
     int i, j;
     int hlp = 0;
+    clock_t cur = 0;
     for (i = 0; i < n; i++)
     {
+         cur = clock();
+         if (((double)cur / CLOCKS_PER_SEC) > 15.0)
+            {
+                dontWaitMore = 1;
+                return;
+            }
         for (j = 0; j < n - i -1; j++)
         {
             if (pData[j] > pData[j + 1])
@@ -43,7 +53,7 @@ void bubbleSort(int *pData)
     }
 }
 
-void countingSort(int *pData)
+void countingSort()
 {
     int hlpMas[100] = {0}; // 100 = maxVal;
     int i, j;
@@ -62,7 +72,7 @@ void countingSort(int *pData)
     }
 }
 
-void quickSort ( int *pData, int first, int last)
+void quickSort (int first, int last)
 {
  int pivot, i, j, buf;
  if ( first >= last ) return;
@@ -82,11 +92,11 @@ void quickSort ( int *pData, int first, int last)
         j--;
     }
  }
-quickSort (pData, first, j);
-quickSort (pData, i, last);
+quickSort (first, j);
+quickSort (i, last);
 }
 
-void getMem(int num, int *pData)
+void getMem(int num)
 {
     pData = (int*)malloc(num * sizeof(int));
     if (pData == NULL)
@@ -99,22 +109,54 @@ void getMem(int num, int *pData)
 int main()
 {
     srand(time(NULL));
-    long numEl[9] = {5, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000};
-    long i;
-  //  clock_t clkBub = 0, clkQck = 0, clkCnt = 0;
-    clock_t start, finish;
+    long numEl[9] = {5, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8};
+    int i;
+    printf("BubbleSort\n");
+    for (i = 0; i < 9; i++)
+      {
+        n = numEl[i];
+        printf("%9d ", numEl[i]);
+        getMem(n);
+        screwUpData(pData);
+        start = clock();
+        bubbleSort();
+        fin = clock() - start;
+        if (dontWaitMore == 0)
+        {
+            printf("%10.4f", (double)fin / CLOCKS_PER_SEC);
+        }
+        else printf("       n/a");
+        free(pData);
+        pData = NULL;
+        printf("\n");
+      }
+    printf("\nCountingSort\n");
     for (i = 0; i < 9; i++)
     {
         n = numEl[i];
-        getMem(n, pData);
-
+        printf("%9d ", numEl[i]);
+        getMem(n);
         screwUpData(pData);
-        /*countingSort(pData);
         start = clock();
-        finish = clock();
-*/
-
+        countingSort();
+        fin = clock() - start;
+        printf("%10.4f\n", (double)fin / CLOCKS_PER_SEC);
         free(pData);
+        pData = NULL;
+    }
+    printf("\nQuickSort\n");
+    for (i = 0; i < 9; i++)
+    {
+        n = numEl[i];
+        printf("%9d ", numEl[i]);
+        getMem(n);
+        screwUpData(pData);
+        start = clock();
+        quickSort(0, n - 1);
+        fin = clock() - start;
+        printf("%10.4f\n", (double)fin / CLOCKS_PER_SEC);
+        free(pData);
+        pData = NULL;
     }
     return 0;
 }
