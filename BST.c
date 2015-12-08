@@ -31,7 +31,7 @@ void addElem(int val)
         }
         else
         {
-            printf("%d was in tree!", val);
+            printf("%d was in tree\n!", val);
             return;
         }
     }
@@ -127,30 +127,14 @@ void delElem(int val)
         printf("Tree doesn't have %d\n", val);
         return;
     }
-    if ((cur == root) && ((cur -> left != NULL) ^ (cur -> right != NULL)))
-    {
-        if (root -> left != NULL)
-        {
-           root -> data = root -> left -> data;
-           free(root -> left) ;
-           root -> left = NULL;
-        }
-        else
-        {
-           root -> data = root -> right -> data;
-           free(root -> right) ;
-           root -> right = NULL;
-        }
-        return;
-    }
-    if ((cur == root) && (cur -> left == NULL) && (cur -> right == NULL))
-    {
-        free(root);
-        root = NULL;
-        return;
-    }
     if ((cur -> left == NULL) && (cur -> right == NULL))
     {
+        if (cur == root)
+        {
+            free(root);
+            root = NULL;
+            return;
+        }
         if (prev -> data > val)
         {
             prev -> left = NULL;
@@ -164,6 +148,18 @@ void delElem(int val)
     }
     if ((cur -> left == NULL) ^ (cur -> right == NULL))
     {
+        if (cur == root)
+        {
+            if (cur -> left == NULL)
+            {
+                root = root -> right;
+            }
+            else
+            {
+                root = root -> left;
+            }
+            return;
+        }
         if (cur -> left == NULL)
         {
             if (prev -> data > val)
@@ -192,22 +188,13 @@ void delElem(int val)
     if ((cur -> left != NULL) && (cur -> right != NULL))
     {
         node *hlp = cur -> right;
-        prev = cur;
         while (hlp -> left != NULL)
         {
-            prev = hlp;
             hlp = hlp -> left;
         }
-        cur -> data = hlp -> data;
-        if (prev != cur)
-        {
-            prev -> left = hlp -> right;
-        }
-        else
-        {
-            cur -> right = hlp -> right;
-        }
-        free(hlp);
+        int bf = hlp -> data;
+        delElem(hlp -> data);
+        cur -> data = bf;
         return;
     }
 }
@@ -240,10 +227,6 @@ void printByDown(node *cur)
 
 void delTree(node *cur)
 {
-    if (root == NULL)
-    {
-        return;
-    }
     if (cur -> left != NULL)
     {
         delTree(cur -> left);
@@ -253,10 +236,6 @@ void delTree(node *cur)
         delTree(cur -> right);
     }
     free(cur);
-    if (cur = root)
-    {
-        root = NULL;
-    }
 }
 
 int main()
@@ -309,6 +288,10 @@ int main()
             }
         }
     }
-    delTree(root);
+    if (root != NULL)
+    {
+        delTree(root);
+        root = NULL;
+    }
     return 0;
 }
