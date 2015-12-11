@@ -148,8 +148,16 @@ void chkLoop()
         twoStep = head -> next;
         while ((twoStep != NULL) && (twoStep != oneStep))
         {
-            twoStep = twoStep -> next -> next;
-            oneStep = oneStep -> next;
+            if (twoStep -> next -> next != NULL)
+            {
+                twoStep = twoStep -> next -> next;
+                oneStep = oneStep -> next;
+            }
+            else
+            {
+                printf("It's a loop\n");
+                return;
+            }
         }
         if (twoStep != NULL)
         {
@@ -209,6 +217,7 @@ int main()
         if (c == 'n')
         {
             makeNorm();
+            continue;
         }
     }
     deleteList();
