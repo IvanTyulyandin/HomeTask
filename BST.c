@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 typedef struct node node;
+typedef struct myTree myTree;
 
 struct node
 {
@@ -9,11 +10,14 @@ struct node
     struct node *right;
 };
 
-node *root;
-
-void addElem(int val)
+struct myTree
 {
-    node *cur = root;
+    struct node *root;
+};
+
+void addElem(int val, myTree* tree)
+{
+    node *cur = tree -> root;
     node *prev = NULL;
     while (cur != NULL)
     {
@@ -31,7 +35,7 @@ void addElem(int val)
         }
         else
         {
-            printf("%d was in tree\n!", val);
+            printf("%d was in tree!\n", val);
             return;
         }
     }
@@ -42,7 +46,7 @@ void addElem(int val)
         put -> data = val;
         put -> right = NULL;
         put -> left = NULL;
-        if (root != NULL)
+        if (tree -> root != NULL)
         {
             if (prev -> data > val)
             {
@@ -55,7 +59,7 @@ void addElem(int val)
         }
         else
         {
-            root = put;
+            tree -> root = put;
         }
     }
 }
@@ -82,9 +86,9 @@ void printTree(node *cur)
     printf(")");
 }
 
-void areInTree(int val)
+void areInTree(int val, myTree* tree)
 {
-    node *cur = root;
+    node *cur = tree -> root;
     while ((cur != NULL) && (cur -> data != val))
     {
         if (cur -> data > val)
@@ -106,9 +110,9 @@ void areInTree(int val)
     }
 }
 
-void delElem(int val)
+void delElem(int val, myTree* tree)
 {
-    node *cur = root;
+    node *cur = tree -> root;
     node *prev = NULL;
     while ((cur != NULL) && (cur -> data != val))
     {
@@ -129,10 +133,10 @@ void delElem(int val)
     }
     if ((cur -> left == NULL) && (cur -> right == NULL))
     {
-        if (cur == root)
+        if (cur == tree -> root)
         {
-            free(root);
-            root = NULL;
+            free(tree -> root);
+            tree -> root = NULL;
             return;
         }
         if (prev -> data > val)
@@ -148,15 +152,15 @@ void delElem(int val)
     }
     if ((cur -> left == NULL) ^ (cur -> right == NULL))
     {
-        if (cur == root)
+        if (cur == tree -> root)
         {
             if (cur -> left == NULL)
             {
-                root = root -> right;
+                tree -> root = tree -> root -> right;
             }
             else
             {
-                root = root -> left;
+                tree -> root = tree -> root -> left;
             }
             return;
         }
@@ -193,7 +197,7 @@ void delElem(int val)
             hlp = hlp -> left;
         }
         int bf = hlp -> data;
-        delElem(hlp -> data);
+        delElem(hlp -> data, tree);
         cur -> data = bf;
         return;
     }
@@ -242,6 +246,14 @@ int main()
 {
     char c;
     int val;
+    myTree *tree;
+    tree = (myTree*)malloc(sizeof(myTree));
+    if (tree == NULL)
+    {
+        printf("Not enough memory!");
+        exit(0);
+    }
+    tree -> root = NULL;
     printf("a - add\ns - search\nd - delete\nU - print by increase\nD - print by decrease\np - simply print\nq - quit\n");
     while ((c = getchar()) != 'q')
     {
@@ -249,49 +261,67 @@ int main()
         {
             printf("Enter int to add ");
             scanf("%d", &val);
-            addElem(val);
+            addElem(val, tree);
+            continue;
         }
         if (c == 's')
         {
             printf("Enter int to search ");
             scanf("%d", &val);
-            areInTree(val);
+            areInTree(val, tree);
+            continue;
         }
         if (c == 'd')
         {
             printf("Enter int to delete ");
             scanf("%d", &val);
-            delElem(val);
+            delElem(val, tree);
+            continue;
         }
         if (c == 'U')
         {
-            if (root != NULL)
+            if (tree -> root != NULL)
             {
-                printByUp(root);
+                printByUp(tree -> root);
                 printf("\n");
             }
+            else
+            {
+                printf("No elements!\n");
+            }
+            continue;
         }
         if (c == 'D')
         {
-            if (root != NULL)
+            if (tree -> root != NULL)
             {
-                printByDown(root);
+                printByDown(tree -> root);
                 printf("\n");
             }
+            else
+            {
+                printf("No elements!\n");
+            }
+            continue;
         }
         if (c == 'p')
         {
-            if (root != NULL)
+            if (tree -> root != NULL)
             {
-                printTree(root);
+                printTree(tree -> root);
                 printf("\n");
             }
+            else
+            {
+                printf("No elements!\n");
+            }
+            continue;
         }
     }
-    if (root != NULL)
+    if (tree -> root != NULL)
     {
-        delTree(root);
-        root = NULL;
+        delTree(tree -> root);
+        tree -> root = NULL;
     }
     return 0;
 }
