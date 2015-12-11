@@ -13,7 +13,7 @@ void screwUpData()
    int i;
    for (i = 0; i < n; i++)
     {
-        pData[i] = rand()%100;
+        pData[i] = rand()%maxVal;
     }
 }
 
@@ -32,10 +32,10 @@ void bubbleSort()
     dontWaitMore = 0;
     int i, j;
     int hlp = 0;
-    clock_t cur = 0;
+    clock_t st = 0, cur;
     for (i = 0; i < n; i++)
     {
-         cur = clock();
+         cur = clock() - st;
          if (((double)cur / CLOCKS_PER_SEC) > 15.0)
             {
                 dontWaitMore = 1;
@@ -102,7 +102,7 @@ void getMem(int num)
     if (pData == NULL)
     {
         printf("Not enough memory!");
-        system("pause");
+        exit();
     }
 }
 
@@ -110,9 +110,10 @@ int main()
 {
     srand(time(NULL));
     long numEl[9] = {5, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8};
+    const int cntEl = sizeof(numEl) / sizeof(long);
     int i;
     printf("BubbleSort\n");
-    for (i = 0; i < 9; i++)
+    for (i = 0; i < cntEl; i++)
       {
         n = numEl[i];
         printf("%9d ", numEl[i]);
@@ -131,7 +132,7 @@ int main()
         printf("\n");
       }
     printf("\nCountingSort\n");
-    for (i = 0; i < 9; i++)
+    for (i = 0; i < cntEl; i++)
     {
         n = numEl[i];
         printf("%9d ", numEl[i]);
@@ -145,7 +146,7 @@ int main()
         pData = NULL;
     }
     printf("\nQuickSort\n");
-    for (i = 0; i < 9; i++)
+    for (i = 0; i < cntEl; i++)
     {
         n = numEl[i];
         printf("%9d ", numEl[i]);
