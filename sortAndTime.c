@@ -102,7 +102,7 @@ void getMem(int num)
     if (pData == NULL)
     {
         printf("Not enough memory!");
-        exit();
+        exit(0);
     }
 }
 
