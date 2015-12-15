@@ -1,7 +1,7 @@
-#include <stdio.h>
+ #include <stdio.h>
 
 typedef struct node node;
-typedef struct list list;
+typedef struct myList myList;
 
 struct node
 {
@@ -9,10 +9,10 @@ struct node
     struct node *next;
 };
 
-struct mylist;
+struct myList
 {
-    node *head = NULL;
-    node *last = NULL;
+    struct node *head;
+    struct node *last;
 };
 
 void add(int val, myList* list)
@@ -21,32 +21,32 @@ void add(int val, myList* list)
     newNode = (node*)malloc(sizeof(node));
     if (newNode != NULL)
     {
-        if (list.head != NULL)
+        if (list -> head != NULL)
         {
-            list.last -> next = newNode;
-            list.last = newNode;
+            list -> last -> next = newNode;
+            list -> last = newNode;
             newNode -> data = val;
-            list.last -> next = NULL;
+            list -> last -> next = NULL;
         }
         else
         {
-            list.head = newNode;
-            list.head -> data = val;
-            list.head -> next = NULL;
-            list.last = list.head;
+            list -> head = newNode;
+            list -> head -> data = val;
+            list -> head -> next = NULL;
+            list -> last = list -> head;
         }
     }
     else
     {
         printf("Not enough memory!");
-        exit();
+        exit(0);
     }
 }
 
 void printList(myList* list)
 {
     node *cur;
-    cur = list.head;
+    cur = list -> head;
     while (cur != NULL)
     {
         printf("%d ", cur -> data);
@@ -59,27 +59,27 @@ void deleteList(myList* list)
 {
     node *cur;
     node *after;
-    cur = list.head;
+    cur = list -> head;
     while (cur != NULL)
     {
         after = cur -> next;
         free(cur);
         cur = after;
     }
-    list.head = NULL;
-    list.last = NULL;
+    list -> head = NULL;
+    list -> last = NULL;
 }
 
 void deleteElem(int val, myList* list)
 {
    node *cur, *befCur;
-   cur = head;
-   if (list.head != NULL)
+   cur = list -> head;
+   if (list -> head != NULL)
    {
-      if (list.head != list.last)
+      if (list -> head != list -> last)
       {
-          befCur = list.head;
-          cur = list.head -> next;
+          befCur = list -> head;
+          cur = list -> head -> next;
           while ((cur != NULL) && (cur -> data != val))
           {
               befCur = cur;
@@ -92,21 +92,21 @@ void deleteElem(int val, myList* list)
           }
           else
           {
-              if (list.head -> data == val)
+              if (list -> head -> data == val)
               {
-                  cur = list.head;
-                  list.head = list.head -> next;
+                  cur = list -> head;
+                  list -> head = list -> head -> next;
                   free(cur);
               }
           }
       }
       else
       {
-          if (list.head -> data == val)
+          if (list -> head -> data == val)
           {
-              free(list.head);
-              list.head = NULL;
-              list.last = NULL;
+              free(list -> head);
+              list -> head = NULL;
+              list -> last = NULL;
           }
       }
    }
@@ -119,10 +119,10 @@ int main()
     if (list == NULL)
     {
         printf("Not enough memory!");
-        exit();
+        exit(0);
     }
-    list.head = NULL;
-    list.last = NULL;
+    list -> head = NULL;
+    list -> last = NULL;
     char c;
     int hlp;
     while ((c = getchar()) != 'q')
@@ -131,22 +131,22 @@ int main()
         {
             printf("Enter int to list ");
             scanf("%d", &hlp);
-            add(hlp);
+            add(hlp, list);
             continue;
         }
         if (c == 'r')
         {
             printf("Enter int to delete from list ");
             scanf("%d", &hlp);
-            deleteElem(hlp);
+            deleteElem(hlp, list);
             continue;
         }
         if (c == 'p')
         {
-            printList();
+            printList(list);
             continue;
         }
     }
-    deleteList();
+    deleteList(list);
     return 0;
 }
