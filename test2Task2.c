@@ -1,24 +1,27 @@
-void entReverseStr(char *num)
+const int maxLen = 255;
+
+void entRevStr(char *n)
 {
-    char c;
     int i = 0;
+    char c;
     while ((c = getchar()) != '\n')
     {
-        num[maxLen - i] = c;
+        n[maxLen - i] = c;
         i++;
     }
-    num[maxLen] = 0;
+    n[maxLen - i] = 0;
 }
 
-int cmp(char *num1, char *num2)
+int cmp(char *n1, char *n2)
 {
-    int i;
-    for (i = maxLen; i > 0; i--)
+    int i = 0;
+    while (n1[maxLen - i] == n2[maxLen - i])
     {
-        if (num1[i] != num2[i])
+        if ((n1[maxLen - i] == 0) && (n2[maxLen - i] == 0))
         {
-            return (int*)(num1[i] - num2[i]);
+            return 0;
         }
+        i++;
     }
-    return 0;
+    return (int)(n1[maxLen - i] - n2[maxLen - i]);
 }
