@@ -331,11 +331,9 @@ void useHt(int(*fp)(char* , hashT*), int size, char *s)
 
 int main()
 {
-    const int sizeConst = 1;
-    const int sizeSum = 5000;
-    const int sizeRot13 = 100000;
-    int allSize[3] = {sizeConst, sizeSum, sizeRot13};
+    const int hashSize = 100000;
     int hashArr[3] = {hashConst, hashSum, hashRot13};
+    char *descriptions[] = {"hashConst", "hashSum", "hashRot13"};
     int sizeArr = 3;
     char *s;
     s = (char*)malloc(sizeof(char) * maxLenStr);
@@ -348,28 +346,11 @@ int main()
     clock_t start, delta;
     for (i = 0; i < sizeArr; i++)
     {
-        switch (i)
-        {
-            case 0:
-                {
-                   printf("hashConst\n");
-                   break;
-                }
-            case 1:
-                {
-                    printf("hashSum\n");
-                    break;
-                }
-            case 2:
-                {
-                    printf("hashRot13\n");
-                    break;
-                }
-        }
+        printf("%s\n", descriptions[i]);
         start = clock();
-        useHt(hashArr[i], allSize[i], s);
+        useHt(hashArr[i], hashSize, s);
         delta = clock() - start;
-        printf("    %.4f\n\n", (double)delta / CLOCKS_PER_SEC);
+        printf("    Time %.4f\n\n", (double)delta / CLOCKS_PER_SEC);
     }
     free(s);
     return 0;
