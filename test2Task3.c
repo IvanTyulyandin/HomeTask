@@ -24,10 +24,13 @@ void searchDoubleSlash(FILE *f)
                     {
                         printf("%c", str[i]);
                     }
-                    if ((str[i] == '/') && (prev == '/'))
+                    else
                     {
-                        wereTwoSlash = 1;
-                        printf("//");
+                        if ((str[i] == '/') && (prev == '/'))
+                        {
+                            wereTwoSlash = 1;
+                            printf("//");
+                        }
                     }
                     prev = str[i];
                 }
