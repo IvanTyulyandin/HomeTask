@@ -334,6 +334,7 @@ int cntMaxLen(hashT *ht)
         while (cur != NULL)
         {
             curLen++;
+            cur = cur -> next;
         }
         if (curLen > maxLen)
         {
