@@ -1,0 +1,144 @@
+#include <stdio.h>
+#include <string.h>
+
+const int INST_LD = 0;
+const int INST_ST = 1;
+const int INST_LDC = 2;  // 0 - 2 need addr or int for args
+const int INST_ADD = 3;
+const int INST_SUB = 4;
+const int INST_CMP = 5;
+const int INST_RET = 6;
+const int INST_ERR = 7;
+const int INST_JMP = 8; //8 - 9 need char* for args, it will be used for parsing
+const int INST_BR = 9;
+const int BLOCK_SIZE = 262144; // 2^18 size of data/stack
+const int CODE_SIZE = 10000;
+const int STR_SIZE = 255;
+
+typedef struct instr instr;
+typedef struct label label;
+
+struct instr
+{
+    int type;
+    union arg
+    {
+        int num;
+        char *label;
+    };
+};
+struct label
+{
+    char *name;
+    int addr;
+};
+
+int* initBlock(int size) // for data and stack init
+{
+    int *block;
+    block = (int*)malloc(size * sizeof(int));
+    if (block == NULL)
+    {
+        printf("Not enough memory for data/stack!");
+        exit(1);
+    }
+    return block;
+}
+
+char* getStr()
+{
+    char* buf;
+    buf = (char*)malloc(sizeof(char) * STR_SIZE);
+    if (buf == NULL)
+    {
+        printf("Not enough memory! getStr");
+        exit(1);
+    }
+    return buf;
+}
+
+char* deleteSpaces(char* s)
+{
+    while (*s == ' ')
+    {
+        s ++;
+    }
+    return s;
+}
+
+char* delSomeChar(char *s, int howMuchToDel)
+{
+    return s + howMuchToDel;
+}
+
+instr parseStr(char *s, label *LB, int *LP, int IP)
+{
+    instr whatToRet;
+    s = deleteSpaces(s);
+    char *buf;
+    buf = getStr();
+    buf[0] = 0;
+    if (strchr(s, ':') != NULL) // searching labels
+        {
+            int i = 0;
+            while ((s[i] != ' ') && (s[i] != ':'))
+            {
+                buf[i] = s[i];
+                printf("%c", buf[i]);
+                i ++;
+            }
+            printf("\n");
+            buf[i] = 0;
+            strcpy(LB[*LP].name, buf);
+            LB[*LP].addr = IP;
+            (*LP) ++;
+            s = delSomeChar(s, strlen(buf));
+            s = deleteSpaces(s);
+            s = s + 1; // deleting :
+            s = deleteSpaces(s);
+        }
+    return whatToRet;
+}
+
+int main()
+{
+    int *SS, *DS, IP = 0, SP = 0, LP = 0; // LP - pointer to top of a label array
+    instr *CS;
+    label *LB; // LB - label array
+    SS = initBlock(BLOCK_SIZE);
+    DS = initBlock(BLOCK_SIZE);
+    CS = (instr*)malloc(sizeof(instr) * CODE_SIZE);
+    LB = (label*)malloc(sizeof(label) * CODE_SIZE);
+    if ((CS == NULL) || (LB == NULL))
+    {
+        printf("Not enough memory for code or label!");
+        exit(1);
+    }
+    FILE *f = fopen("input.txt", "r");
+    if (f == NULL)
+    {
+        printf("File wasn't opened!");
+        exit(1);
+    }
+    char *s;
+    s = getStr();
+    while (fgets(s, STR_SIZE, f) != NULL)
+    {
+        printf("Start\n");
+        s[strlen(s) - 1] = 0;
+        parseStr(s, LB, &LP, IP);
+        printf("Done\n");
+    }
+    fclose(f);
+    int i;
+    for (i = 0; i < LP; i ++)
+    {
+        printf("%s %d", LB[i].name, LB[i].addr);
+    }
+    free(SS);
+    free(DS);
+    free(CS);
+    free(LB);
+    printf("Doneeee\n");
+    return 0;
+}
