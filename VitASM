@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 const int INST_LD = 0;
@@ -68,18 +69,21 @@ char* deleteSpaces(char* s)
 
 char* delSomeChar(char *s, int howMuchToDel)
 {
-    return s + howMuchToDel;
+    return s + howMuchToDel * sizeof(char);
 }
 
 instr parseStr(char *s, label *LB, int *LP, int IP)
 {
     instr whatToRet;
+    printf("%s\n", s);
     s = deleteSpaces(s);
+    printf("%s\n", s);
     char *buf;
     buf = getStr();
     buf[0] = 0;
     if (strchr(s, ':') != NULL) // searching labels
         {
+            printf("went to :\n");
             int i = 0;
             while ((s[i] != ' ') && (s[i] != ':'))
             {
@@ -96,7 +100,13 @@ instr parseStr(char *s, label *LB, int *LP, int IP)
             s = deleteSpaces(s);
             s = s + 1; // deleting :
             s = deleteSpaces(s);
+            printf("%s string\n", s);
         }
+    printf("Done\n");
+    free(buf);
+    printf("Done\n");
+    whatToRet.num = 0;
+    whatToRet.type = INST_ERR;
     return whatToRet;
 }
 
@@ -124,10 +134,8 @@ int main()
     s = getStr();
     while (fgets(s, STR_SIZE, f) != NULL)
     {
-        printf("Start\n");
         s[strlen(s) - 1] = 0;
         parseStr(s, LB, &LP, IP);
-        printf("Done\n");
     }
     fclose(f);
     int i;
@@ -139,6 +147,5 @@ int main()
     free(DS);
     free(CS);
     free(LB);
-    printf("Doneeee\n");
     return 0;
 }
