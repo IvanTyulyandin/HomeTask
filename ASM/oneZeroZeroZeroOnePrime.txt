@@ -1,0 +1,84 @@
+ldc 1
+st 0 
+
+ldc 0;
+st 1; here will be 10001 prime number
+
+ldc 3; fisrt to look
+st 2 ; ds[2] - number for check
+
+ldc 2
+st 3
+
+ld 3
+st 5
+
+cR:ld 0 ; check range
+   ldc 10001
+   cmp
+   br fN ; findNext
+   jmp end
+ fN:st 255
+    ld 2
+    st 4 ; save copy of number for check
+  Eu:ld 4 ; Euclid's alg
+     ld 5
+     cmp
+     br cont
+     jmp eCh; endCheck
+   cont:ldc 1
+        cmp
+        br m2
+     m1:st 255
+        ld 4
+        ld 5
+        sub
+        st 5
+        jmp Eu
+     m2:st 255
+        ld 5
+        ld 4
+        sub
+        st 4
+        jmp Eu
+    eCh:st 255 ; ds[4] - res of Euclid's alg
+        ldc 1
+        ld 4
+        cmp
+        br nN ; nextNumber
+        st 255
+        ld 3
+        ldc 1
+        add 
+        ld 2
+        cmp
+        br iI ; incInt, cont check
+        st 255 ; else found prime
+        ld 0
+        ldc 1
+        add
+        st 0
+        ld 2
+        st 1
+     nN:ldc 2
+        st 3 ; new iter, start from 2
+        ld 3
+        st 5 ; make copy for Euclid's alg
+        ld 2
+        ldc 1
+        add
+        st 2
+        jmp cR
+    iI:st 255
+       ld 3
+       ldc 1
+       add
+       st 3
+       ld 3
+       st 5
+       ld 2
+       st 4
+       jmp Eu
+end:st 255
+    ld 1
+    ret
