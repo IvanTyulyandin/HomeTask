@@ -1,0 +1,106 @@
+ldc 208574561 ; ds[127] - answer
+st 0
+
+ldc 2
+st 1 ; need gcd ds[0] and ds[1]
+
+chk:ld 0
+    ldc 1
+    ld 1
+    sub
+    cmp
+    br prEu ; prepare for Euclid's alg    
+    jmp End
+
+prEu:st 255
+     ld 0
+     st 2
+     ld 1
+     st 3
+Eu:ld 2
+   ld 3
+   cmp
+   br cnt
+   jmp eAl
+cnt:ldc 1
+    cmp
+    br m12
+  m11:st 255
+      ld 2
+      ld 3
+      sub
+      st 3
+      jmp Eu
+  m12:st 255
+      ld 3
+      ld 2
+      sub
+      st 2
+      jmp Eu
+eAl:st 255
+    ld 1
+    ld 2
+    cmp
+    br nN ; next number
+
+;prime check, need 10 - 13
+prCh:ld 1
+     st 10
+
+     ldc 2 ; start from 2
+     st 11
+
+  ch:ld 10
+     ld 11
+     ldc 1
+     add
+     cmp
+     br next
+     jmp eAlg
+  next:st 255
+       ld 10
+       st 12
+       ld 11
+       st 13
+    Eu1:ld 12
+        ld 13
+        cmp
+        br cont
+        jmp eA
+    cont:ldc 1
+         cmp
+         br m22
+     m21:st 255
+         ld 12
+         ld 13
+         sub
+         st 13
+         jmp Eu1
+     m22:st 255
+         ld 13
+         ld 12
+         sub
+         st 12
+         jmp Eu1
+     eA:ldc 1
+        ld 12
+        cmp
+        br eAlg ; next number
+        ld 11
+        ldc 1
+        add
+        st 11
+        jmp ch
+  eAlg:br nN0; if 0 - prime, else not prime 
+       ld 1
+       st 127
+ nN0:st 255 ; need for keeping stack empty 
+ nN:st 255
+    ld 1
+    ldc 1
+    add
+    st 1
+    jmp chk
+End:st 255
+    ld 127       
+    ret
