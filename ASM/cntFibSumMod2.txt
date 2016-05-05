@@ -1,0 +1,32 @@
+ldc 2000000
+st 0
+ldc 1
+st 1 ; f(2n + 1)
+ldc 1
+st 2 ; f(2n + 2)
+ldc 0
+st 3 ; here will be res
+chk : ld 2
+      ld 0
+      cmp
+      ldc -1
+      cmp
+      br iter
+      st 255
+      jmp end
+iter : st 255
+       ld 2
+       ld 3
+       add
+       st 3 	
+       ld 1
+       ld 2
+       add
+       st 1
+       ld 2
+       ld 1
+       add
+       st 2
+       jmp chk
+end : ld 3
+      ret 
