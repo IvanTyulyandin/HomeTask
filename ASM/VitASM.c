@@ -369,6 +369,6 @@ int main()
     free(CS);
     free(LB);
     free(s);
-    free(name)
+    free(name);
     return 0;
 }
