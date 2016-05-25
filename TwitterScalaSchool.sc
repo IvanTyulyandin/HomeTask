@@ -146,10 +146,7 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
     this.right.filterAcc(p, this.left.filterAcc(p, acc))
   }
 
-  def union(that: TweetSet): TweetSet = {
-    that.incl(this.elem)
-    this.left.union(this.right.union(that))
-  }
+  def union(that: TweetSet): TweetSet =left.union(right).union(that).incl(elem)
 
   def mostRetweeted = {
     def max(a: Tweet, b: Tweet): Tweet = if (a.retweets > b.retweets) a else b
@@ -171,7 +168,6 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
     new Cons(mostRetw, this.remove(mostRetw).descendingByRetweet)
   }
 
-  def trending(words : List[String]) = Nil
   /**
    * The following methods are already implemented
    */
