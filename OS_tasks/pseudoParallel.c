@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
@@ -109,9 +110,6 @@ int main()
    {
        whatDone = executeOneTask(tasks);
    } while (whatDone != -1);
-   for (i = 0; i < NUM_TASKS; i ++)
-   {
-       free(tasks[i].currStr);
-   }
    return 0;
 }
+
