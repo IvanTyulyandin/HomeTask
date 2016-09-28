@@ -51,11 +51,11 @@ char* getNextArg(char** str)
     return res;
 }
 
-char* splitIfSomeSpecial(char** str) //try to find < or >
+char* splitIfNotSTDIN(char** str) //try to find < or >
 {
     char* buf;
     buf = getStr();
-    if (!(strstr((*str), ">")) && !(strstr((*str), "<")))
+    if (!(strstr((*str), ">")))
     {
         strcpy(buf, (*str));
         (*str)[0] = 0;
@@ -64,7 +64,7 @@ char* splitIfSomeSpecial(char** str) //try to find < or >
     else
     {
         int i = 0;
-        while (((*str)[0] != '<') && ((*str)[0] != '>'))
+        while ((*str)[0] != '>')
         {
             buf[i] = (*str)[0];
             i ++;
@@ -124,20 +124,6 @@ void setDesc(char* str) //str looks like < (or) > file.txt
     return;
 }
 
-int countPipe(char* str)
-{
-    int i = 0;
-    int count = 0;
-    while (str[i] != 0)
-    {
-        if (str[i] == '|')
-        {
-            count ++;
-        }
-    }
-    return count;
-}
-
 char* getNewCommand(char** str) // str looks like com1 | com2 | com3 etc.
 {
     if ((*str)[0] == 0)
@@ -187,7 +173,6 @@ void executeOne(int sumOfCom, int curCom, int descIn, int descOut, char* command
             exit(1);
         }
     }
-    //printf("in execute1\n");
     pid_t pid = fork();
     if (pid == -1)
     {
@@ -220,11 +205,15 @@ void executeOne(int sumOfCom, int curCom, int descIn, int descOut, char* command
         dup2(fd[1], 1);
         execvp(args[0], &args[0]);
         // if here - exec error
+        printf("Execvp error! Program was not found!\n");
+        exit(EXIT_FAILURE);
     }
     else
     {
-        //close(fd[1]);
-        printf("in parent 1\n");
+        if ((sumOfCom - 1) != curCom)
+        {
+            close(fd[1]);
+        }
         wait(0);
         executeOne(sumOfCom, curCom + 1, fd[0], descOut, commands);
         close(fd[0]);
@@ -232,8 +221,56 @@ void executeOne(int sumOfCom, int curCom, int descIn, int descOut, char* command
     return;
 }
 
-void firstExecute(char* commands[MAX_COMMANDS], int numCom)
+char* findInputRedirect(char** str)
 {
+    char* buf = getStr();
+    buf[0] = 0;
+    if (strstr((*str), "<") != NULL)
+    {
+        int i = 0;
+        while ((*str)[i] != '<')
+        {
+            i ++;
+        }
+        buf[0] = (*str)[i]; // put < in buf
+        int bufCur = 1;
+        i ++;
+        while ((*str)[i] == ' ') // put all spaces between < and name of file
+        {
+            buf[bufCur] = (*str)[i];
+            i ++;
+            bufCur ++;
+        }
+        while ((*str)[i] != ' ') // put name of file to buf
+        {
+            buf[bufCur] = (*str)[i];
+            i ++;
+            bufCur ++;
+        }
+        buf[bufCur] = 0;
+        int j;
+        int sLen = strlen((*str));
+        for (j = i - bufCur; j + bufCur < sLen; j ++)
+        {
+            (*str)[j] = (*str)[j + bufCur];
+        }
+        (*str)[j] = 0;
+    }
+    return buf;
+}
+
+void firstExecute(char* commands[MAX_COMMANDS], int numCom, char* input, char* output)
+{
+    int descIn = STDIN_FILENO;
+    int descOut = STDOUT_FILENO;
+    if (input[0] != 0)
+    {
+        descIn = open(getFileName(input), O_RDONLY);
+    }
+    if (output[0] != 0)
+    {
+        descOut = open(getFileName(output), O_WRONLY);
+    }
     pid_t pid = fork();
     if (pid == -1)
     {
@@ -242,12 +279,12 @@ void firstExecute(char* commands[MAX_COMMANDS], int numCom)
     }
     if (pid == 0)
     {
-        executeOne(numCom, 0, STDIN_FILENO, STDOUT_FILENO, commands);
+        executeOne(numCom, 0, descIn, descOut, commands);
+        exit(EXIT_SUCCESS);
     }
     else
     {
         wait(0);
-        printf("all was done\n");
     }
     return;
 }
@@ -257,17 +294,21 @@ int main()
     char* buf;
     buf = getStr();
     char* commands[MAX_COMMANDS];
-    gets(buf);
+    fgets(buf, 80, stdin);
+    buf[strlen(buf) - 1] = 0;
     int i;
     for (i = 0; i < MAX_COMMANDS; i ++)
     {
         commands[i] = getStr();
     }
+    char* tmp = getStr();
+    char* output = getStr();
+    char* input = getStr();
     while (strcmp(buf, "exit") != 0)
     {
-        char* tmp;
-        tmp = getStr();
-        tmp = splitIfSomeSpecial(&buf); // in tmp - args, in buf - >, <, etc.
+        tmp = splitIfNotSTDIN(&buf); // in tmp - args, in buf - > NameOfFile
+        strcpy(output, buf);
+        input = findInputRedirect(&tmp);
         i = 0;
         while (tmp[0] != 0)
         {
@@ -276,9 +317,10 @@ int main()
             i ++;
         }
         commands[i] = NULL;
-        firstExecute(commands, i);
-        printf("Done!!\n");
-        gets(buf);
+        firstExecute(commands, i, input, output);
+        printf("Done!\n");
+        fgets(buf, 80, stdin);
+        buf[strlen(buf) - 1] = 0;
     }
     return 0;
 }
