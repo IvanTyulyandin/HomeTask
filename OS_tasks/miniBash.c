@@ -87,43 +87,6 @@ char* getFileName(char* str) // str looks like < file.txt
     return str;
 }
 
-void setDesc(char* str) //str looks like < (or) > file.txt
-{
-    if (str[0] == 0)
-    {
-        return;
-    }
-    char* fileName = getFileName(str);
-    switch (str[0])
-    {
-        case '<':
-            {
-                int input = open(fileName, O_RDONLY);
-                if (input == -1)
-                {
-                    printf("error open!");
-                    exit(1);
-                }
-                dup2(input, STDIN_FILENO);
-                close(input);
-                break;
-            }
-        case '>':
-            {
-                int output = open(fileName, O_WRONLY);
-                if (output == -1)
-                {
-                    printf("error open!");
-                    exit(1);
-                }
-                dup2(output, STDOUT_FILENO);
-                close(output);
-                break;
-            }
-    }
-    return;
-}
-
 char* getNewCommand(char** str) // str looks like com1 | com2 | com3 etc.
 {
     if ((*str)[0] == 0)
