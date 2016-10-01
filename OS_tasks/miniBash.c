@@ -119,7 +119,6 @@ void executeOne(int sumOfCom, int curCom, int descIn, int descOut, char* command
 {
     int fd[2];
     fd[0] = -1; // will be used for checking pipe (if it was done)
-    //printf("--%d %d--\n", curCom, sumOfCom);
     if (sumOfCom == curCom)
     {
         return;
@@ -222,17 +221,17 @@ char* findInputRedirect(char** str)
     return buf;
 }
 
-void firstExecute(char* commands[MAX_COMMANDS], int numCom, char* input, char* output)
+void firstExecute(char* commands[MAX_COMMANDS], int numCom, char* strInput, char* strOutput)
 {
     int descIn = STDIN_FILENO;
     int descOut = STDOUT_FILENO;
-    if (input[0] != 0)
+    if (strInput[0] != 0)
     {
-        descIn = open(getFileName(input), O_RDONLY);
+        descIn = open(getFileName(strInput), O_RDONLY | O_CREAT);
     }
-    if (output[0] != 0)
+    if (strOutput[0] != 0)
     {
-        descOut = open(getFileName(output), O_WRONLY);
+        descOut = open(getFileName(strOutput), O_WRONLY | O_CREAT);
     }
     pid_t pid = fork();
     if (pid == -1)
@@ -265,13 +264,13 @@ int main()
         commands[i] = getStr();
     }
     char* tmp = getStr();
-    char* output = getStr();
-    char* input = getStr();
+    char* strOutput = getStr();
+    char* strInput = getStr();
     while (strcmp(buf, "exit") != 0)
     {
-        tmp = splitIfNotSTDIN(&buf); // in tmp - args, in buf - > NameOfFile
-        strcpy(output, buf);
-        input = findInputRedirect(&tmp);
+        strcpy(tmp ,splitIfNotSTDIN(&buf)); // in tmp - args, in buf - > NameOfFile
+        strcpy(strOutput, buf);
+        strcpy(strInput,findInputRedirect(&tmp));
         i = 0;
         while (tmp[0] != 0)
         {
@@ -279,8 +278,8 @@ int main()
             tmp = deleteSpaces(tmp);
             i ++;
         }
-        commands[i] = NULL;
-        firstExecute(commands, i, input, output);
+        strcpy(commands[i], "\0");
+        firstExecute(commands, i, strInput, strOutput);
         printf("Done!\n");
         fgets(buf, 80, stdin);
         buf[strlen(buf) - 1] = 0;
