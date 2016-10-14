@@ -5,20 +5,26 @@ import java.io.File
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 
-class SplitColor(){
+case class SplitColor(){
   var red : Int = 0
   var green : Int = 0
   var blue : Int = 0
+  def setRed(newRed : Int) = {red = newRed}
+  def setGreen(newGreen : Int) = {green = newGreen}
+  def setBlue(newBlue : Int) = {blue = newBlue}
 }
+
 
 
 object Blur_filter {
 
-  def getImg(nameOfFile : String) : BufferedImage ={
+  def getImg() : BufferedImage ={
+    println("Enter name of file to Blur")
+    val nameOfFile = scala.io.StdIn.readLine()
     ImageIO.read(new File(nameOfFile))
   }
 
-  val img = getImg("me.jpg")
+  val img = getImg()
   val w = img.getWidth
   val h = img.getHeight
 
@@ -39,14 +45,13 @@ object Blur_filter {
   }
 
   def getSplitArray(src : BufferedImage) : Array[Array[SplitColor]] ={
-    val res = Array.ofDim[SplitColor](w, h)
+    val res = Array.fill[SplitColor](w,h)(new SplitColor)
     for (x <- 0 until w)
       for (y <- 0 until h){
         val pixel = src.getRGB(x, y)
-        println(x, y)
-        res(x)(y).red = getRed(pixel)
-        res(x)(y).green = getGreen(pixel)
-        res(x)(y).blue = getBlue(pixel)
+        res(x)(y).setRed(getRed(pixel))
+        res(x)(y).setGreen(getGreen(pixel))
+        res(x)(y).setBlue(getBlue(pixel))
       }
     res
   }
@@ -57,10 +62,10 @@ object Blur_filter {
     var redSum = 0
     var greenSum = 0
     var blueSum = 0
-    var numOfPixels = 0
-    for (i <- (x - rad) until (x + rad))
-      for (j <- (y - rad) until (y + rad)){
-        if ((i >= 0) && (i < h) && (j >= 0) && (j < w)) {
+    var numOfPixels = 1
+    for (i <- (x - rad) until (x + rad + 1))
+      for (j <- (y - rad) until (y + rad + 1)){
+        if ((i >= 0) && (i < w) && (j >= 0) && (j < h)) {
             redSum = redSum + SplitArray(i)(j).red
             greenSum += SplitArray(i)(j).green
             blueSum += SplitArray(i)(j).blue
@@ -78,13 +83,57 @@ object Blur_filter {
 
   def BlurHorizontal(from : Int, to : Int, rad : Int) : BufferedImage ={
     for (y <- from until to)
-      for (x <- 0 until w)
-        out.setRGB(x,y, BlurOnePixel(x,y, rad))
+      for (x <- 0 until w) {
+        if ((x >= 0) && (x < w) && (y >= 0) && (y < h))
+          out.setRGB(x, y, BlurOnePixel(x, y, rad))
+      }
     out
   }
 
+  def BlurHorPar(amountOfThreads : Int, rad : Int) : Unit ={
+    val rowPerTask = h / amountOfThreads
+    val forThread = Range(0, h - rowPerTask) by rowPerTask
+    val tasks = forThread.map(x => {
+        new Thread {
+          override def run() : Unit = {
+            println(x, x + rowPerTask)
+            BlurHorizontal(x, x + rowPerTask, rad)
+          }
+        }
+      }
+    )
+    tasks.foreach(x => x.start())
+    tasks.foreach(x => x.join())
+  }
+
+  def BlurVertical(from : Int, to : Int, rad : Int) : BufferedImage ={
+    for (x <- from until to)
+      for (y <- 0 until h) {
+        if ((x >= 0) && (x < w) && (y >= 0) && (y < h))
+          out.setRGB(x, y, BlurOnePixel(x, y, rad))
+      }
+    out
+  }
+
+  def BlurVertPar(amountOfThreads : Int, rad : Int) : Unit ={
+    val colPerTask : Int = w / amountOfThreads
+    val forThread = Range(0, w) by colPerTask
+    val tasks = forThread.map(x => {
+        new Thread {
+          override def run() : Unit = {
+            println(x, x + colPerTask)
+            BlurVertical(x, x + colPerTask, rad)
+          }
+        }
+    }
+    )
+    tasks.foreach(x => x.start())
+    tasks.foreach(x => x.join())
+  }
+
   def main(args: Array[String]): Unit = {
-    ImageIO.write(BlurHorizontal(0, h, 2), "jpg", new File("test.jpg"))
+    BlurHorPar(2, 2)
+    ImageIO.write(out, "jpg", new File("test.jpg"))
   }
 }
 
