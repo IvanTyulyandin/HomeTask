@@ -1,0 +1,21 @@
+//radius 3
+
+Num of threads: 1
+Horizontal 1352.267 ms
+Vertical 1143.034252 ms
+
+Num of threads: 2
+Horizontal 918.445576 ms
+Vertical 710.589466 ms
+
+Num of threads: 4
+Horizontal 795.895349 ms
+Vertical 673.1592 ms
+
+Num of threads: 8
+Horizontal 807.899846 ms
+Vertical 684.763765 ms
+
+Num of threads: 16
+Horizontal 825.570483 ms
+Vertical 711.25957 ms
