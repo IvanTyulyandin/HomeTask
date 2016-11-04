@@ -61,87 +61,71 @@ void initEntry(entry* forInit, char* strForProc)
     strcpy((*forInit).currStr, strForProc);
     (*forInit).funPtr = printOneWord;
     (*forInit).priority = rand() % MAX_TASKS;
+    (*forInit).entries.tqe_next = NULL;
+    (*forInit).entries.tqe_prev = NULL;
     return;
 }
 
 void addToScheduler(entry* newTask)
 {
-    if (sched.tqh_first == NULL)
+    entry* tmp;
+    entry* hlp = NULL;
+    TAILQ_FOREACH(tmp, &sched, entries)
+    {
+        if ((*tmp).priority > (*newTask).priority)
+        {
+            hlp = tmp;
+        }
+    }
+    if (hlp == NULL)
     {
         TAILQ_INSERT_HEAD(&sched, newTask, entries);
     }
     else
     {
-        entry* tmp = sched.tqh_first;
-        entry* hlp = tmp;
-        while ((tmp != NULL) && ((*tmp).priority > (*newTask).priority))
+        if (hlp == TAILQ_LAST(&sched, tailhead))
         {
-            hlp = tmp;
-            tmp = tmp -> entries.tqe_next;
+            TAILQ_INSERT_TAIL(&sched, newTask, entries);
         }
-        if (tmp == sched.tqh_first)
+        else
         {
-            printf("\nPUT HEAD!!!\n\n");
-            TAILQ_INSERT_HEAD(&sched, newTask, entries);
+            TAILQ_INSERT_AFTER(&sched, hlp, newTask, entries);
         }
-        else if (tmp == NULL)
-             {
-                printf("\nPUT TAIL!!!\n\n");
-                TAILQ_INSERT_TAIL(&sched, newTask, entries);
-             }
-             else
-             {
-                 printf("\nPUT BEFORE!!!\n\n");
-                 TAILQ_INSERT_AFTER(&sched, hlp, newTask, entries);
-             }
     }
-    return;
-}
-
-void printQueue()
-{
-    entry* np;
-    printf("----QUEUE----\n");
-    for (np = sched.tqh_first; np != NULL; np = np -> entries.tqe_next)
-    {
-        printf("%s pr %d\n", np->currStr, np->priority);
-        sleep(1);
-    }
-    printf("----END OF QUEUE----\n");
     return;
 }
 
 entry getTask()
 {
     entry newTask;
-    if (sched.tqh_first == NULL)
+    if (TAILQ_EMPTY(&sched))
     {
         printf("Schedule is emtpy!");
         exit(1);
     }
-    newTask = (*(sched.tqh_first));
-    TAILQ_REMOVE(&sched, sched.tqh_first, entries);
+    newTask = (*TAILQ_FIRST(&sched));
+    newTask.entries.tqe_next = NULL;
+    newTask.entries.tqe_prev = NULL;
+    TAILQ_REMOVE(&sched, TAILQ_FIRST(&sched), entries);
     return newTask;
 }
 
-void exeTask(entry newTask)
+void exeTask(entry* newTask)
 {
-    if (newTask.priority == -1)
+    if ((*newTask).currStr[0] != 0)
     {
-        return;
-    }
-    if (newTask.currStr[0] != 0)
-    {
-        newTask.funPtr(&(newTask.currStr));
-        if (newTask.currStr[0] != 0)
+        (*newTask).funPtr(&((*newTask).currStr));
+        if ((*newTask).currStr[0] != 0)
         {
-            printf("try to add\n");
-            sleep(4);
-            addToScheduler(&newTask);
+            (*newTask).priority = rand() % MAX_TASKS;
+        }
+        else
+        {
+            (*newTask).priority = -1;
         }
     }
-}
 
+}
 
 int main()
 {
@@ -162,16 +146,17 @@ int main()
     initEntry(n3, "3 33");
     addToScheduler(n3);
     //end of part
-    entry newTask;
-    printQueue();
-    while (sched.tqh_first != NULL)
+    while (! TAILQ_EMPTY(&sched))
     {
-        newTask = getTask();
-        newTask.priority = rand() % 3;
-        printf("\nADDING %s pr %d\n", newTask.currStr, newTask.priority);
-        addToScheduler(&newTask);
-        printQueue();
-        sleep(1);
+        entry gettedTask = getTask();
+        entry* newTask = malloc(sizeof(entry));
+        (*newTask) = gettedTask;
+        (*newTask).priority = rand() % MAX_TASKS;
+        exeTask(newTask);
+        if ((*newTask).priority != -1)
+        {
+            addToScheduler(newTask);
+        }
     }
     return 0;
 }
