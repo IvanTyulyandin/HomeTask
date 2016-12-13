@@ -1,5 +1,3 @@
-import scala.collection.immutable.Stream.Empty
-
 /**
   * Created by ivan on 19.11.16.
   */
@@ -49,7 +47,7 @@ object LongIntAdding {
     res
   }
 
-  def parCreateCharArr : Array[Char] = {
+  def parCreateCharArr() : Array[Char] = {
 
     val res : Array[Char] = new Array[Char](numLen)
 
@@ -114,9 +112,9 @@ object LongIntAdding {
                   }
         }
         newThr.start()
-        handlePart(leftBorder, (rightBorder - leftBorder) / 2)
+        handlePart(leftBorder, (rightBorder - leftBorder - 1) / 2)
         newThr.join()
-        res(rightBorder) = prefixScanOperator(res(rightBorder / 2), res(rightBorder))
+        res(rightBorder) = prefixScanOperator(res((rightBorder - 1) / 2), res(rightBorder))
       }
     }
 
@@ -124,6 +122,47 @@ object LongIntAdding {
     res
   }
 
+  def distributePhase() : Array[Char] = {
+
+    val res : Array[Char] = carry
+    val numPerThr = numLen / thrNum
+
+    def doOnPart(leftBorder : Int, rightBorder : Int) : Unit = {
+      var cur = rightBorder - leftBorder + 1 // it's power of 2
+      while (cur >= 2) {
+        var i = cur - 1 + leftBorder
+        while (i <= rightBorder) {
+          val tmp = res(i)
+          res(i) = prefixScanOperator(res(i), res(i - cur / 2))
+          res(i - cur / 2) = tmp
+          i += cur
+        }
+        cur /= 2
+      }
+    }
+
+    def handlePart(leftBorder : Int, rightBorder : Int) : Unit = {
+      if (rightBorder - leftBorder + 1 == numPerThr) {
+        doOnPart(leftBorder, rightBorder)
+      }
+      else {
+        val newThr = new Thread() {
+          override def run() : Unit = {
+            handlePart((rightBorder - leftBorder) / 2 + 1, rightBorder)
+          }
+        }
+        val tmp = res(rightBorder)
+        res(rightBorder) = prefixScanOperator(res(rightBorder), res((rightBorder - leftBorder - 1) / 2))
+        res((rightBorder - leftBorder - 1) / 2) = tmp
+        newThr.start()
+        handlePart(leftBorder, (rightBorder - leftBorder - 1) / 2)
+        newThr.join()
+      }
+    }
+
+    handlePart(0, numLen - 1)
+    res
+  }
 
   def main(args: Array[String]): Unit = {
     num1 = getNum(scala.io.StdIn.readLine())
@@ -136,22 +175,31 @@ object LongIntAdding {
       }
     }
     numLen = num1.length
-    for (i <- num1.indices) {
-      print(num1(i))
-    }
-    println()
-    for (i <- num2.indices) {
-      print(num2(i))
-    }
-    carry = parCreateCharArr
-    println()
-    for (i <- 0 until numLen) {
-      print(carry(i))
-    }
-    println()
+    carry = parCreateCharArr()
     carry = collectPhase()
+    carry(numLen - 1) = 'M'
+    carry = distributePhase()
+    val res = new Array[Int](numLen + 1)
+    res(numLen) = 0
     for (i <- 0 until numLen) {
-      print(carry(i))
+      res(i) = num1(i) + num2(i)
+      if (carry(i) == 'C') {
+        res(i) += 1
+      }
+      res(i) %= 10
+    }
+    if (carry(numLen - 1) == 'C') {
+      res(numLen) = 1
+    }
+    var state = 0
+    for (i <- numLen to 0 by -1) {
+      state match {
+        case 0 => if (res(i) != 0) {
+                    state = 1
+                    print(res(i))
+                  }
+        case 1 => print(res(i))
+      }
     }
   }
 }
