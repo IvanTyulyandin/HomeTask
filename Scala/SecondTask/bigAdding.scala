@@ -107,14 +107,14 @@ object LongIntAdding {
       }
       else {
         val newThr = new Thread() {
-                  override def run() : Unit = {
-                    handlePart((rightBorder - leftBorder) / 2 + 1, rightBorder)  // + 1 for nice middle :)
-                  }
+          override def run() : Unit = {
+            handlePart((rightBorder - leftBorder) / 2 + 1 + leftBorder, rightBorder)
+          }
         }
         newThr.start()
-        handlePart(leftBorder, (rightBorder - leftBorder - 1) / 2)
+        handlePart(leftBorder, (rightBorder - leftBorder - 1) / 2 + leftBorder)
         newThr.join()
-        res(rightBorder) = prefixScanOperator(res((rightBorder - 1) / 2), res(rightBorder))
+        res(rightBorder) = prefixScanOperator(res((rightBorder - 1) / 2 + leftBorder), res(rightBorder))
       }
     }
 
@@ -148,14 +148,14 @@ object LongIntAdding {
       else {
         val newThr = new Thread() {
           override def run() : Unit = {
-            handlePart((rightBorder - leftBorder) / 2 + 1, rightBorder)
+            handlePart((rightBorder - leftBorder) / 2 + 1 + leftBorder, rightBorder)
           }
         }
         val tmp = res(rightBorder)
-        res(rightBorder) = prefixScanOperator(res(rightBorder), res((rightBorder - leftBorder - 1) / 2))
-        res((rightBorder - leftBorder - 1) / 2) = tmp
+        res(rightBorder) = prefixScanOperator(res(rightBorder), res((rightBorder - leftBorder - 1) / 2 + leftBorder))
+        res((rightBorder - leftBorder - 1) / 2 + leftBorder) = tmp
         newThr.start()
-        handlePart(leftBorder, (rightBorder - leftBorder - 1) / 2)
+        handlePart(leftBorder, (rightBorder - leftBorder - 1) / 2 + leftBorder)
         newThr.join()
       }
     }
