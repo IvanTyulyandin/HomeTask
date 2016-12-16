@@ -7,7 +7,7 @@ object LongIntAdding {
   var num1 : Array[Int] = Array.emptyIntArray
   var num2 : Array[Int] = Array.emptyIntArray
   var carry : Array[Char] = Array.emptyCharArray
-  var thrNum = 2
+  var thrNum = 1
   var numLen = 1 // will be changed in main after toEqualSize
 
   def getNum (str : String) : Array[Int] = {
@@ -167,6 +167,8 @@ object LongIntAdding {
   def main(args: Array[String]): Unit = {
     num1 = getNum(scala.io.StdIn.readLine())
     num2 = getNum(scala.io.StdIn.readLine())
+    println("Enter num of threads")
+    thrNum = scala.io.StdIn.readInt()
     if (num1.length > num2.length) {
       num2 = toEqualSize(num2, num1.length)
     } else {
