@@ -114,7 +114,7 @@ object LongIntAdding {
         newThr.start()
         handlePart(leftBorder, (rightBorder - leftBorder - 1) / 2 + leftBorder)
         newThr.join()
-        res(rightBorder) = prefixScanOperator(res((rightBorder - 1) / 2 + leftBorder), res(rightBorder))
+        res(rightBorder) = prefixScanOperator(res((rightBorder - 1 - leftBorder) / 2 + leftBorder), res(rightBorder))
       }
     }
 
