@@ -1,0 +1,24 @@
+1,2,4 threads
+
+LongIntAdding:
+Length of number is 2^15
+1 thread 3.152758 ms
+2 thread 2.49421 ms
+4 thread 1.981037 ms
+
+LinComp:
+Length of arrays is 2^15
+1 thread 4.84559 ms
+2 thread 2.305733 ms
+4 thread 2.847373 ms
+
+Brackets:
+1 thread 3.900925 ms
+2 thread 2.413183 ms
+4 thread 1.433852 ms
+
+Turtle:
+it generates moves, that's why so long time
+1 thread 11.438854 ms
+2 thread 9.129408 ms
+4 thread 6.645169 ms
