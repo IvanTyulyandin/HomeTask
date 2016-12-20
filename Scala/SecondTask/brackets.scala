@@ -46,7 +46,6 @@ object Brackets {
     val numPerThr = numLen / thrNum
 
     def doOnPart(leftBorder : Int, rightBorder : Int) : Unit = {
-      println("here")
       for (i <- leftBorder + 1 to rightBorder) {
         res(i) = parScanOperator(res(i - 1), res(i))
       }
