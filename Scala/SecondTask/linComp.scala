@@ -1,7 +1,3 @@
-/**
-  * Created by ivan on 19.11.16.
-  */
-
 object LinComp {
 
   var num1 : Array[Int] = Array.emptyIntArray
