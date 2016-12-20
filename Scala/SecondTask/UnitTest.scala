@@ -57,7 +57,4 @@ class Unit_test extends FlatSpec{
     assert(Brackets.parScanOperator((0,1),(1,0)) == (1,1))
   }
   
-  "operator for Turtle" should "give correct return" in {
-    
-  }
 }
