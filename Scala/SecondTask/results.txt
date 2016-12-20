@@ -13,6 +13,7 @@ Length of arrays is 2^15
 4 thread 2.847373 ms
 
 Brackets:
+Length of seq is 2^15
 1 thread 3.900925 ms
 2 thread 2.413183 ms
 4 thread 1.433852 ms
