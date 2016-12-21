@@ -1,0 +1,10 @@
+Enter num of points
+10000
+Enter max range: from 0 to ...
+1000
+Enter num of clusters
+100
+Enter eta
+1
+(seq = 12713.160327 ms)
+(parSeq = 28982.1974 ms)
