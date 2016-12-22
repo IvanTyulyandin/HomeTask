@@ -32,9 +32,9 @@ object KMeans {
     val res = means.map(c => (c, points.map(
         p => if (findClosest(p, means) == c) p
              else hlp
-        )
+        ).filter(_ != hlp)
       )
-    ).filter(_ != hlp)
+    )
 
     res
   }
@@ -43,8 +43,8 @@ object KMeans {
     if (points.isEmpty)
       oldMean
     else {
-      val (x,y) = points.foldLeft(0.0, 0.0)((a : Point, b : Point) => (a._1 + b._1, a._2 + b._2))
-      (x / points.length, y / points.length)
+      val xy = points.unzip
+      (xy._1.sum / points.length, xy._2.sum / points.length)
     }
   }
 
@@ -70,7 +70,7 @@ object KMeans {
 }
 
 
-object TimeMeasurment {
+object TimeMeasurement {
 
   type Point = (Double, Double)
 
